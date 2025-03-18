@@ -1,0 +1,33 @@
+Package: dragongis
+Title: Research compendium for gis processing of the DRAGON project database
+Version: 0.0.1
+Authors@R: c(
+    person(given   = "Romain",
+           family  = "Frelat",
+           role    = c("aut"),
+           email   = "rom.frelat@gmail.com",
+           comment = c(ORCID = "0000-0002-8631-4398")),
+    person(given   = "Lisa", 
+           family  = "Nicvert" , 
+           email = "lisa.nicvert@fondationbiodiversite.fr", 
+           role = c("aut"), 
+           comment = c(ORCID = "0009-0006-5763-0865")))
+Description: 
+URL: https://github.com/Dragon-odonates/dragongis
+BugReports: https://github.com/Dragon-odonates/dragongis/issues
+License: GPL (>= 3)
+Encoding: UTF-8
+LazyData: true
+LazyDataCompression: xz
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.3.2
+Imports: 
+    devtools,
+    dplyr,
+    here,
+    remotes
+Depends: 
+    R (>= 3.5.0),
+    rgbif,
+    sf,
+    terra

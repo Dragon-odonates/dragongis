@@ -1,0 +1,15 @@
+.Rproj.user
+.Rhistory
+.RData
+.Ruserdata
+
+# ignore raw dataset
+data/raw-data
+
+# ignore heavy data 
+data/derived-data/vect_obs.rds
+data/temp_1km
+
+# ignore dev file
+analyses/test*.R
+analyses/old*.R
