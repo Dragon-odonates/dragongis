@@ -8,8 +8,9 @@ data/raw-data
 
 # ignore heavy data 
 data/derived-data/vect_obs.rds
+data/derived-data/occ_all_df.rds
 data/temp_1km
 
 # ignore dev file
-analyses/test*.R
+analyses/test*
 analyses/old*.R

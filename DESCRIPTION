@@ -22,12 +22,29 @@ LazyDataCompression: xz
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.2
 Imports: 
+    circlize,
     devtools,
-    dplyr,
     here,
+    htmltools,
+    knitr,
+    quarto,
     remotes
 Depends: 
     R (>= 3.5.0),
+    crosstalk,
+    dplyr,
+    DT,
+    gt,
+    heatmaply,
+    leaflet,
+    mapview,
+    palmerpenguins,
+    plotly,
     rgbif,
     sf,
-    terra
+    shiny,
+    shinycssloaders,
+    terra,
+    tidyverse,
+    tmap,
+    viridis
