@@ -1,0 +1,10 @@
+name: dragon-spdis
+title: Dragon Species distribution
+username: rfrelat-cesab
+account: rfrelat-cesab
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 14429791
+bundleId: 10056262
+url: https://rfrelat-cesab.shinyapps.io/dragon-spdis/
+version: 1

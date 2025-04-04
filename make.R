@@ -23,9 +23,16 @@ devtools::load_all(here::here())
 
 ## Run Project ----
 
-# 1 Create grid from the observation dataset
-source(here::here("analyses", "1_create_grid"))
+# 1 Clean and format the observation dataset
+source(here::here("analyses", "B1_transform_occ.R"))
 
+# 2 Calculate summary per species
+source(here::here("analyses", "B1_transform_occ.R"))
+
+
+
+
+# older version (to be removed soon)
 # 2 Calculate number of observation and number of species per grid cell 
 # for resolution 5km and 10km
 source(here::here("analyses", "2_get_map.R"))
@@ -34,3 +41,11 @@ source(here::here("analyses", "2bis_get_map_1000.R"))
 
 # 3 Get other GIS information?
 # to be defined ...
+
+shiny::runApp(appDir = "analyses/app")
+
+rsconnect::deployApp(appDir = "analyses/app",
+                     appFiles = list.files("analyses/app", recursive = TRUE),
+                     appName = "dragon-spdis",
+                     appTitle = "Dragon Species distribution")
+# 5Mb bundle
