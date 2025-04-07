@@ -29,6 +29,9 @@ source(here::here("analyses", "B1_transform_occ.R"))
 # 2 Calculate summary per species
 source(here::here("analyses", "B2_rasterspecies.R"))
 
+# 2bis Calculate species accumulation curves
+source(here::here("analyses", "B2bis_speciesacc.R"))
+
 # 3 Exploratory dashboard
 quarto::quarto_render(here::here("analyses", "B3_explo_dashboard.qmd"))
 

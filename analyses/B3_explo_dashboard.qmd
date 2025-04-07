@@ -7,6 +7,7 @@ format:
     embed-resources: true
 ---
 
+# General exploration
 
 ```{r load}
 library(plotly)
@@ -115,4 +116,25 @@ tm_shape(ra84) +
 
 
 
+# Species accumulation curves
 
+```{r speciacc}
+# load data
+load(here::here("data", "derived-data", "speacc_50.Rdata"))
+
+seqx <- 2:100
+# smooth the curve
+lo <- loess(sa_all$Q0.5 ~ seqx)
+fig <- plot_ly(x = seqx) 
+fig <- fig %>% 
+       add_lines(y = predict(lo), name = "all", 
+       line = list(color = 'rgb(0, 0, 0)', width = 2)) 
+
+for (i in seq_along(sa_db)){
+  li <- loess(sa_db[[i]]$Q0.5 ~ seqx)
+  fig <- fig %>% add_lines(y = predict(li), name = names(sa_db)[i]) 
+}
+fig %>% layout(title = "Species accumulation curves", 
+              xaxis = list(title = "Number of observations"),
+              yaxis = list(title = "Number of species"))
+```
