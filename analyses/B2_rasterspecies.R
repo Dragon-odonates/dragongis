@@ -9,7 +9,9 @@ res_grid <- 10000
 df <- readRDS(here::here("data", "derived-data", "occ_all_df.rds"))
 grid10 <- readRDS(here::here("data", "derived-data", paste0("grid_", res_grid,".rds")))
 
-
+# mini <- data.table::data.table(df[,c("species", "dbID", "Year", "grid10kmID", "observationID", "Country")])
+# mini <- mini[!duplicated(mini),]
+# saveRDS(mini, here::here("analyses", "app", "data", "occ_mini.rds"))#, compress = "xz")
 
 # 2. compute spatial statistics -----------------------------
 # transform gridID as factor with all cell values
@@ -60,9 +62,13 @@ for (s in names(n)[n>50000]){
   ns <- setValues(grid10, as.numeric(n_grid))
   # percentage obs per grid cell
   p_grid <- tapply(df$observationID[ms], df$gridfac[ms], nodup)/obs_grid*100
+  p_grid[is.na(obs_grid)] <- NA
+  p_grid[!is.na(obs_grid)&is.na(p_grid)] <- 0
   ps <- setValues(grid10, as.numeric(p_grid))
   # percentage year per grid cell
   y_grid <- tapply(df$Year[ms], df$gridfac[ms], nodup)/year_grid*100
+  y_grid[is.na(obs_grid)] <- NA
+  y_grid[!is.na(obs_grid)&is.na(y_grid)] <- 0
   ys <- setValues(grid10, as.numeric(y_grid))
 
   nrast <- c(nrast, ns)

@@ -20,7 +20,13 @@ shinyUI(fluidPage(
            withSpinner(tmapOutput('mappo'), type=4)),
     tabPanel("Perc Year",
            withSpinner(tmapOutput('mappy'), type=4))
-  )
+    ),
+    tabsetPanel(
+      tabPanel("N Observations",
+             plotlyOutput('obsts')),
+      tabPanel("N Cells",
+             plotlyOutput('gridts'))
+      )
   )
 )
 )

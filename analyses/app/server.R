@@ -55,6 +55,14 @@ shinyServer(function(input, output, session) {
     return(list("bk"=pybk, "lab"=pylab))
   })
 
+  occsp <- reactive({
+    if(input$spe=="All"){
+      return(dt)
+    } else {
+      return(dt[dt$species%in%input$spe,])
+    }
+  })
+
   observe({
     tmapProxy("mapsp", session, {
       tm_remove_layer(401) +
@@ -80,6 +88,24 @@ shinyServer(function(input, output, session) {
       tm_raster(input$spe, interpolate=FALSE, zindex = 601,
                 breaks=pyleg()$bk, title=pyleg()$lab, group.control = "none")
     })  
+  })
+
+  output$obsts <- renderPlotly({
+    dbi <- occsp()
+    nobs_year <- aggregate(dbi$observationID, list(dbi$dbID, dbi$Year), nodup)
+    plot_ly(nobs_year, x = ~Group.2, y = ~x, color = ~Group.1) %>% 
+            layout(xaxis = list(title = 'Year'),
+               yaxis = list(title = 'Number of observations'), 
+               barmode = 'stack')
+  })
+
+  output$gridts <- renderPlotly({
+    dbi <- occsp()
+    nobs_year <- aggregate(dbi$grid10kmID, list(dbi$Country, dbi$Year), nodup)
+    plot_ly(nobs_year, x = ~Group.2, y = ~x, color = ~Group.1) %>% 
+            layout(xaxis = list(title = 'Year'),
+               yaxis = list(title = 'Number of grid cells'), 
+               barmode = 'stack')
   })
   
 })

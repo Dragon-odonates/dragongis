@@ -4,6 +4,7 @@ author: "Dragon CESAB"
 format:
   dashboard:
     orientation: columns
+    embed-resources: true
 ---
 
 

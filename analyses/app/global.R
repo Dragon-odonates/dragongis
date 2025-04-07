@@ -3,9 +3,12 @@ suppressPackageStartupMessages({
   require(shinycssloaders)
   require(tmap)
   require(terra)
+  require(plotly)
   # require(viridis)
   # require(leaflet)
 })
+
+nodup <- function(x) {return(sum(!duplicated(x)))}
 
 if(Sys.getenv('SHINY_PORT') == "") {options(shiny.maxRequestSize=10000*1024^2)}
 
@@ -18,4 +21,6 @@ suppressMessages(tmap_mode("view"))
 sp <- readRDS(here::here(folder, "sp10000.rds"))
 po <- readRDS(here::here(folder, "po10000.rds"))
 py <- readRDS(here::here(folder, "py10000.rds"))
+
+dt <- readRDS(here::here(folder, "occ_mini.rds"))
 

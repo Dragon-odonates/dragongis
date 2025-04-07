@@ -23,29 +23,20 @@ devtools::load_all(here::here())
 
 ## Run Project ----
 
-# 1 Clean and format the observation dataset
+# 1 Clean and format the observation dataset - create grids
 source(here::here("analyses", "B1_transform_occ.R"))
 
 # 2 Calculate summary per species
-source(here::here("analyses", "B1_transform_occ.R"))
+source(here::here("analyses", "B2_rasterspecies.R"))
 
+# 3 Exploratory dashboard
+quarto::quarto_render(here::here("analyses", "B3_explo_dashboard.qmd"))
 
-
-
-# older version (to be removed soon)
-# 2 Calculate number of observation and number of species per grid cell 
-# for resolution 5km and 10km
-source(here::here("analyses", "2_get_map.R"))
-# for resolution 1km (and possibly lower)
-source(here::here("analyses", "2bis_get_map_1000.R"))
-
-# 3 Get other GIS information?
-# to be defined ...
-
+# shiny app per species
 shiny::runApp(appDir = "analyses/app")
 
-rsconnect::deployApp(appDir = "analyses/app",
-                     appFiles = list.files("analyses/app", recursive = TRUE),
-                     appName = "dragon-spdis",
-                     appTitle = "Dragon Species distribution")
+# rsconnect::deployApp(appDir = "analyses/app",
+#                      appFiles = list.files("analyses/app", recursive = TRUE),
+#                      appName = "dragon-spdis",
+#                      appTitle = "Dragon Species distribution")
 # 5Mb bundle
