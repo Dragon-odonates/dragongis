@@ -24,16 +24,16 @@ devtools::load_all(here::here())
 ## Run Project ----
 
 # 1 Clean and format the observation dataset - create grids
-source(here::here("analyses", "B2_transform_occ.R"))
+source(here::here("analyses", "02_transform_occ.R"))
 
 # 2 Calculate summary per species
-source(here::here("analyses", "B3_rasterspecies.R"))
+source(here::here("analyses", "03_rasterspecies.R"))
 
 # 2bis Calculate species accumulation curves
-# source(here::here("analyses", "B3bis_speciesacc.R"))
+# source(here::here("analyses", "03bis_speciesacc.R"))
 
 # 3 Exploratory dashboard
-quarto::quarto_render(here::here("analyses", "B4_explo_dashboard.qmd"))
+quarto::quarto_render(here::here("analyses", "04_explo_dashboard.qmd"))
 
 # shiny app per species
 # shiny::runApp(appDir = "analyses/app")
