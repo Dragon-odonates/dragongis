@@ -17,6 +17,11 @@ df <- readRDS(here::here("data", "raw-data", "occ_all.rds"))
 period <- 1990:2024 # time period of interest
 res_grid <- 10000 # grid resolution
 
+# Quick family fix --------------------------------------------------------
+df[scientificName == "Cordulegasteridae",
+   scientificName := "Cordulegastridae"]
+df[family == "Cordulegasteridae",
+   family := "Cordulegastridae"]
 
 # Transform dataset -------------------------------------------------------
 

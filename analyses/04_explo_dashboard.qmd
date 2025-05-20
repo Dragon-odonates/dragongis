@@ -13,6 +13,10 @@ format:
 library(plotly)
 library(terra)
 library(tmap)
+
+library(collapse)
+library(RColorBrewer)
+
 library(here)
 
 funcdir <- here("functions")
@@ -22,7 +26,7 @@ source(here(funcdir, "functions.R"))
 ```{r load}
 tab <- readRDS(here("data", "derived-data", "occ_all_df.rds"))
 rastat <- readRDS(here("data", "derived-data", "stat_10000.rds"))
-ra84 <- project(rastat, crs("EPSG:3857"))
+# rastat <- project(rastat, crs("EPSG:3857"))
 
 # interactive mode for tmap
 suppressMessages(tmap_mode("view"))
@@ -33,30 +37,58 @@ suppressMessages(tmap_mode("view"))
 
 ### Row {.tabset}
 
+```{r}
+# Get colors for datasets
+dsets <- sort(funique(tab$dbID))
+ndat <- length(dsets)
+
+dataset_color <- colorRampPalette(brewer.pal(8, "Dark2"))(ndat)
+names(dataset_color) <- dsets
+
+# Colors for countries
+countries <- sort(funique(tab$Country))
+ncountries <- length(countries)
+
+countries_color <- colorRampPalette(brewer.pal(8, "Dark2"))(ncountries)
+names(countries_color) <- countries
+
+# Colors for fam
+fam <- sort(funique(tab$family))
+nfam <- length(fam)
+
+fam_color <- colorRampPalette(brewer.pal(8, "Dark2"))(nfam)
+names(fam_color) <- fam
+```
+
 ```{r obsyear}
 #| title: obs
 # number of observation per database
-nobs_dbyear <- aggregate(tab$observationID, list(tab$dbID, tab$Year), nodup)
-plot_ly(nobs_dbyear, x = ~Group.2, y = ~x, color = ~Group.1) |> 
-    layout(xaxis = list(title = 'Year'),
-           yaxis = list(title = 'Number of observations'), 
-           barmode = 'stack')
+nobs_dbyear <- aggregate(tab$observationID, 
+                         list(tab$dbID, tab$Year), nodup)
+plot_ly(nobs_dbyear, x = ~Group.2, y = ~x, color = ~Group.1, 
+        type = "scatter", mode = "lines",
+        colors = dataset_color) |> 
+  layout(xaxis = list(title = 'Year'),
+         yaxis = list(title = 'Number of observations'))
 ```
 
 ```{r gridyear}
 #| title: cell
 # number of cells per year per country
 ngrid_countyear <- aggregate(tab$grid10kmID, list(tab$Country, tab$Year), nodup)
-plot_ly(ngrid_countyear, x = ~Group.2, y = ~x, color = ~Group.1) |> 
+plot_ly(ngrid_countyear, x = ~Group.2, y = ~x, color = ~Group.1,
+        type = "scatter", mode = "lines",
+        colors = countries_color) |> 
     layout(xaxis = list(title = 'Year'),
-           yaxis = list(title = 'Number of grid cells'), 
-           barmode = 'stack')
+           yaxis = list(title = 'Number of grid cells'))
 ```
 
 ```{r taxayear}
 #| title: taxa
 nspe_famyear <- aggregate(tab$species, list(tab$family, tab$Year), nodup)
-plot_ly(nspe_famyear, x = ~Group.2, y = ~x, color = ~Group.1) |> 
+plot_ly(nspe_famyear, x = ~Group.2, y = ~x, color = ~Group.1,
+        type = "bar",
+        colors = fam_color) |> 
         layout(xaxis = list(title = 'Year'),
            yaxis = list(title = 'Number of taxa'), 
            barmode = 'stack')
@@ -92,41 +124,44 @@ plot_ly(x = colnames(ngrid_sp_year),
 ## Column {.tabset}
 ```{r spemap}
 #| title: spe
-tm_shape(ra84) +
-       tm_raster("nspe", interpolate = FALSE, breaks = (0:9)*10, group.control = "none") +
+tm_shape(rastat) +
+       tm_raster("nspe", interpolate = FALSE, 
+                 col.scale = tm_scale_continuous(),
+                 group.control = "none") +
        tm_view(basemap.server = "OpenStreetMap",
               set_view = c(7, 55, 4))
 ```
 
 ```{r obsmap}
 #| title: obs
-tm_shape(ra84) +
-       tm_raster("nobs", interpolate = FALSE, group.control = "none",
-       breaks = c(0,1,5,10,50,100, 500,1000, 5000,15000)) +
+
+nobs <- values(rastat)[, "nobs"]
+rng <- range(na.omit(nobs))
+
+tm_shape(rastat) +
+       tm_raster("nobs", interpolate = FALSE, 
+                 group.control = "none",
+                 col.scale = tm_scale(breaks = c(rng[1], 5, 10, 50, 
+                                                 100, 500, 1000, 5000, 15000,
+                                                 rng[2]))) +
        tm_view(basemap.server = "OpenStreetMap",
               set_view = c(7, 55, 4))
-
 ```
 
 ```{r yrmap}
 #| title: year
-tm_shape(ra84) +
-       tm_raster("nyr", interpolate=FALSE, group.control = "none") +
+tm_shape(rastat) +
+       tm_raster("nyr", interpolate = FALSE, 
+                 group.control = "none") +
        tm_view(basemap.server = "OpenStreetMap",
               set_view = c(7, 55, 4))
-
-# tm_shape(ra84) +
-#    tm_raster("nyr5", interpolate=FALSE, group.control = "none") +
-#    tm_view(basemap.server = "OpenStreetMap",
-#            set_view = c(7, 55, 4))
-
 ```
 
 
 
 # Species accumulation curves
 
-```{r speciacc, include=FALSE}
+```{r speciacc, include=FALSE, eval=FALSE}
 # load data
 load(here::here("data", "derived-data", "speacc_50.Rdata"))
 
