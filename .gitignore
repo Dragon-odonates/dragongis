@@ -2,6 +2,8 @@
 .Rhistory
 .RData
 .Ruserdata
+.Renviron
+dragongis.Rproj
 
 # ignore raw dataset
 data/raw-data
