@@ -26,7 +26,8 @@ source(here(funcdir, "functions.R"))
 ```{r load}
 tab <- readRDS(here("data", "derived-data", "occ_all_df.rds"))
 rastat <- readRDS(here("data", "derived-data", "stat_10000.rds"))
-# rastat <- project(rastat, crs("EPSG:3857"))
+# Change CRS
+rastat <- project(rastat, crs("EPSG:3857"))
 
 # interactive mode for tmap
 suppressMessages(tmap_mode("view"))
@@ -66,7 +67,7 @@ names(fam_color) <- fam
 nobs_dbyear <- aggregate(tab$observationID, 
                          list(tab$dbID, tab$Year), nodup)
 plot_ly(nobs_dbyear, x = ~Group.2, y = ~x, color = ~Group.1, 
-        type = "scatter", mode = "lines",
+        type = "scatter", mode = "lines+markers",
         colors = dataset_color) |> 
   layout(xaxis = list(title = 'Year'),
          yaxis = list(title = 'Number of observations'))
@@ -77,7 +78,7 @@ plot_ly(nobs_dbyear, x = ~Group.2, y = ~x, color = ~Group.1,
 # number of cells per year per country
 ngrid_countyear <- aggregate(tab$grid10kmID, list(tab$Country, tab$Year), nodup)
 plot_ly(ngrid_countyear, x = ~Group.2, y = ~x, color = ~Group.1,
-        type = "scatter", mode = "lines",
+        type = "scatter", mode = "lines+markers",
         colors = countries_color) |> 
     layout(xaxis = list(title = 'Year'),
            yaxis = list(title = 'Number of grid cells'))
@@ -125,25 +126,23 @@ plot_ly(x = colnames(ngrid_sp_year),
 ```{r spemap}
 #| title: spe
 tm_shape(rastat) +
-       tm_raster("nspe", interpolate = FALSE, 
+       tm_raster("nspe",
                  col.scale = tm_scale_continuous(),
-                 group.control = "none") +
+                 options = opt_tm_raster(interpolate = FALSE),
+                 group.control = "none",
+                 col.legend = tm_legend(title = "Richness")) +
        tm_view(basemap.server = "OpenStreetMap",
               set_view = c(7, 55, 4))
 ```
 
 ```{r obsmap}
 #| title: obs
-
-nobs <- values(rastat)[, "nobs"]
-rng <- range(na.omit(nobs))
-
 tm_shape(rastat) +
-       tm_raster("nobs", interpolate = FALSE, 
+       tm_raster("nobs", 
+                 options = opt_tm_raster(interpolate = FALSE),, 
                  group.control = "none",
-                 col.scale = tm_scale(breaks = c(rng[1], 5, 10, 50, 
-                                                 100, 500, 1000, 5000, 15000,
-                                                 rng[2]))) +
+                 col.legend = tm_legend(title = "# obs"),
+                 col.scale = tm_scale_intervals(style = "log10_pretty")) +
        tm_view(basemap.server = "OpenStreetMap",
               set_view = c(7, 55, 4))
 ```
@@ -151,8 +150,11 @@ tm_shape(rastat) +
 ```{r yrmap}
 #| title: year
 tm_shape(rastat) +
-       tm_raster("nyr", interpolate = FALSE, 
-                 group.control = "none") +
+       tm_raster("nyr", 
+                 options = opt_tm_raster(interpolate = FALSE), 
+                 group.control = "none",
+                 col.legend = tm_legend(title = "# years"),
+                 col.scale = tm_scale_continuous()) +
        tm_view(basemap.server = "OpenStreetMap",
               set_view = c(7, 55, 4))
 ```
