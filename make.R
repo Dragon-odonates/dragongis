@@ -35,6 +35,9 @@ source(here::here("analyses", "03_rasterspecies.R"))
 # 3 Exploratory dashboard
 quarto::quarto_render(here::here("analyses", "04_explo_dashboard.qmd"))
 
+# 4 Prepare Shiny app data
+source(here::here("analyses", "05_data_for_app.R"))
+
 # shiny app per species
 # shiny::runApp(appDir = "analyses/app")
 

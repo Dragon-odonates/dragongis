@@ -42,7 +42,7 @@ nspe <- values(spe_grid)[, 1]
 # Get species total counts
 n <- table(df$species)
 
-for (s in names(n)[n > 50000]){
+for (s in names(n)){ # [n > 50000]){
   # Get the subset of observations for this species
   ms <- df$species == s
   

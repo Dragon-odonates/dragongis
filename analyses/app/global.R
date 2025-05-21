@@ -9,7 +9,6 @@ suppressPackageStartupMessages({
   require(here)
 })
 
-# nodup <- function(x) {return(sum(!duplicated(x)))}
 funcdir <- here("functions")
 source(here(funcdir, "functions.R"))
 
