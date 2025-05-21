@@ -31,36 +31,26 @@ shinyServer(function(input, output, session) {
   ## Legends ----------
   spleg <- reactive({
     if(input$spe == "All"){
-      # spbk <- (0:8)*10
-      style <- "pretty"
       splab <- "Richness"
     } else {
-      # spbk <- c(0, 0.5, 5, 10, 50, 100, 500, 10000)
-      style <- "log10_pretty"
       splab <- "# observations"
     }
-    return(list("style" = style, "lab" = splab))
+    return(list("lab" = splab))
   })
 
   poleg <- reactive({
     if(input$spe == "All"){
-      # pobk <- c(0, 5, 10, 50, 100, 500, 1000, 5000)
-      style <- "log10_pretty"
       polab <- "# observations"
     } else {
-      # pobk <- c(0, 5, 10, 25, 50, 100)
-      style <- "pretty"
       polab <- "% observations"
     }
-    return(list("style" = style, "lab" = polab))
+    return(list("lab" = polab))
   })
 
   pyleg <- reactive({
-    if(input$spe=="All"){
-      # pybk <- c(0, 0.9, 5, 10, 15, 20, 25, 35)
+    if(input$spe == "All"){
       pylab <- "# years"
     } else {
-      # pybk <- c(0,0.5,5,10,25,50,100)
       pylab <- "% years species detected"
     }
     return(list("lab" = pylab))
@@ -83,11 +73,11 @@ shinyServer(function(input, output, session) {
       tm_raster(input$spe, 
                 options = opt_tm_raster(interpolate = FALSE), 
                 zindex = 401,
-                col.scale = tm_scale_intervals(style = spleg()$style), 
+                col.scale = tm_scale_intervals(as.count = TRUE), 
                 col.legend = tm_legend(title = spleg()$lab), 
                 group.control = "none")
     })  
-  }) |> bindEvent(input$spe)
+  })
 
   observe({
     tmapProxy("mappo", session, {
@@ -96,11 +86,11 @@ shinyServer(function(input, output, session) {
       tm_raster(input$spe, 
                 options = opt_tm_raster(interpolate = FALSE), 
                 zindex = 501,
-                col.scale = tm_scale_intervals(style = poleg()$style), 
+                col.scale = tm_scale_intervals(as.count = TRUE), 
                 col.legend = tm_legend(title = poleg()$lab), 
                 group.control = "none")
     })  
-  }) |> bindEvent(input$spe)
+  })
 
   observe({
     tmapProxy("mappy", session, {
@@ -113,7 +103,7 @@ shinyServer(function(input, output, session) {
                 col.legend = tm_legend(title = pyleg()$lab),
                 group.control = "none")
     })  
-  }) |> bindEvent(input$spe)
+  })
 
 
   # Trends per dataset ------------------------------------------------------

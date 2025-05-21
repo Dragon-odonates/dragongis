@@ -139,7 +139,7 @@ tm_shape(rastat) +
 #| title: obs
 tm_shape(rastat) +
        tm_raster("nobs", 
-                 options = opt_tm_raster(interpolate = FALSE),, 
+                 options = opt_tm_raster(interpolate = FALSE), 
                  group.control = "none",
                  col.legend = tm_legend(title = "# obs"),
                  col.scale = tm_scale_intervals(style = "log10_pretty")) +
