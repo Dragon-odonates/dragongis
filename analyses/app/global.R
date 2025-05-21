@@ -4,11 +4,14 @@ suppressPackageStartupMessages({
   require(tmap)
   require(terra)
   require(plotly)
-  # require(viridis)
-  # require(leaflet)
+  require(collapse)
+  require(RColorBrewer)
+  require(here)
 })
 
-nodup <- function(x) {return(sum(!duplicated(x)))}
+# nodup <- function(x) {return(sum(!duplicated(x)))}
+funcdir <- here("functions")
+source(here(funcdir, "functions.R"))
 
 if(Sys.getenv('SHINY_PORT') == "") {options(shiny.maxRequestSize=10000*1024^2)}
 
@@ -24,3 +27,16 @@ py <- readRDS(here::here(folder, "py10000.rds"))
 
 dt <- readRDS(here::here(folder, "occ_mini.rds"))
 
+# Get colors for datasets
+dsets <- sort(funique(dt$dbID))
+ndat <- length(dsets)
+
+dataset_color <- colorRampPalette(brewer.pal(8, "Dark2"))(ndat)
+names(dataset_color) <- dsets
+
+# Get colors for countries
+countries <- sort(funique(dt$Country))
+ncountries <- length(countries)
+
+countries_color <- colorRampPalette(brewer.pal(8, "Dark2"))(ncountries)
+names(countries_color) <- countries
