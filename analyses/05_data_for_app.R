@@ -15,8 +15,10 @@ df <- readRDS(here::here("data", "derived-data", "occ_all_df.rds"))
 
 statrast <- readRDS(here("data", "derived-data", 
                          paste0("stat_", res_grid, ".rds")))
+statrast <- unwrap(statrast)
 grid10 <- readRDS(here::here("data", "derived-data", 
                              paste0("grid_", res_grid,".rds")))
+grid10 <- unwrap(grid10)
 
 # Transform data ----------------------------------------------------------
 
@@ -43,6 +45,8 @@ nspe <- values(spe_grid)[, 1]
 n <- table(df$species)
 
 for (s in names(n)){ # [n > 50000]){
+  print(s)
+  
   # Get the subset of observations for this species
   ms <- df$species == s
   
@@ -50,7 +54,7 @@ for (s in names(n)){ # [n > 50000]){
   n_grid <- table(df$grid10kmID[ms])
   n_grid[is.na(nobs)] <- NA
   # Add to raster
-  ns <- setValues(grid10, as.numeric(nobs))
+  ns <- setValues(grid10, as.numeric(n_grid))
   
   # Percentage obs of species s contained in each grid cell
   p_grid <- tapply(df$observationID[ms], df$grid10kmID[ms], nodup)/nobs*100
