@@ -73,6 +73,8 @@ terra::values(grid10) <- 1:terra::ncell(grid10)
 id_grid <- terra::extract(grid10, vcoo)
 df$grid10kmID <- id_grid$lyr.1[match(df$coordinatesID, vcoo$coordinatesID)]
 
+# Create a factor
+df[, grid10kmID := factor(grid10kmID, levels=1:ncell(grid10))]
 
 # Export data -------------------------------------------------------------
 

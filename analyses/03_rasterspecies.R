@@ -20,22 +20,18 @@ df <- readRDS(here::here("data", "derived-data", "occ_all_df.rds"))
 grid10 <- readRDS(here::here("data", "derived-data", 
                              paste0("grid_", res_grid,".rds")))
 
-
-
 # Compute spatial statistics -----------------------------
-# transform gridID as factor with all cell values
-df[, gridfac := factor(grid10kmID, levels=1:ncell(grid10))]
 
 # calculate overall statistics per grid cell
 # number of species per cell
-spe_grid <- tapply(df$species, df$gridfac, 
+spe_grid <- tapply(df$species, df$grid10kmID, 
                    function(x) nodup(x, na.rm = FALSE))
 
 # number of observation per cell
-obs_grid <- tapply(df$observationID, df$gridfac, nodup)
+obs_grid <- tapply(df$observationID, df$grid10kmID, nodup)
 
 # number of observation per cell
-year_grid <- tapply(df$Year, df$gridfac, nodup)
+year_grid <- tapply(df$Year, df$grid10kmID, nodup)
 
 # number of observation per year and per cell
 # yearobs_grid <- tapply(df$observationID, list(df$Year, df$gridfac), nodup)
@@ -54,9 +50,6 @@ names(nyr) <- "nyr"
 
 # merge into a single raster file
 statrast <- c(nspe, nobs, nyr)#, nyr5)
-
-# Change CRS
-statrast <- project(statrast, crs("EPSG:3857"))
 
 # export the raster
 saveRDS(statrast, here::here("data", "derived-data", 
