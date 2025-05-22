@@ -17,11 +17,6 @@ df <- readRDS(here::here("data", "raw-data", "occ_all.rds"))
 period <- 1990:2024 # time period of interest
 res_grid <- 10000 # grid resolution
 
-# Quick family fix --------------------------------------------------------
-df[scientificName == "Cordulegasteridae",
-   scientificName := "Cordulegastridae"]
-df[family == "Cordulegasteridae",
-   family := "Cordulegastridae"]
 
 # Transform dataset -------------------------------------------------------
 
@@ -45,9 +40,6 @@ df[, coordinatesID := paste(decimalLongitude,
 df[, dbID := ifelse(is.na(parentDatasetID),
                     datasetID, 
                     parentDatasetID)]
-
-# add country
-df[, Country := substr(dbID, 1, 2)]
 
 # add observation id
 df[, observationID := paste(eventDate, dbID, recorderID, 
@@ -80,6 +72,3 @@ df[, grid10kmID := factor(grid10kmID, levels=1:ncell(grid10))]
 
 saveRDS(df, here::here("data", "derived-data", "occ_all_df.rds"))
 saveRDS(grid10, here::here("data", "derived-data", paste0("grid_", res_grid,".rds")))
-
-# system.time({source("analyses/B2_rasterspecies.R")})
-# 5 min, 14gb

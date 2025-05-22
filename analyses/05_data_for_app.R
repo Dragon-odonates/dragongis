@@ -25,7 +25,7 @@ grid10 <- unwrap(grid10)
 
 ## Transform table ---------------------------------------------------------
 mini <- df[, c("species", "dbID", "Year", 
-               "grid10kmID", "observationID", "Country")]
+               "grid10kmID", "observationID", "country")]
 mini <- mini[!duplicated(mini),]
 
 ## Compute spatial statistics by species -----------------------------
@@ -44,8 +44,10 @@ nspe <- values(spe_grid)[, 1]
 # Get species total counts
 n <- table(df$species)
 
+nsp <- length(n)
 for (s in names(n)){ # [n > 50000]){
-  print(s)
+  i <- which(names(n) == s)
+  print(paste0(s, "(",i ,"/",nsp , ")"))
   
   # Get the subset of observations for this species
   ms <- df$species == s

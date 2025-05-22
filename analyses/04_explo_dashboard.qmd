@@ -47,7 +47,7 @@ dataset_color <- colorRampPalette(brewer.pal(8, "Dark2"))(ndat)
 names(dataset_color) <- dsets
 
 # Colors for countries
-countries <- sort(funique(tab$Country))
+countries <- sort(funique(tab$country))
 ncountries <- length(countries)
 
 countries_color <- colorRampPalette(brewer.pal(8, "Dark2"))(ncountries)
@@ -76,7 +76,7 @@ plot_ly(nobs_dbyear, x = ~Group.2, y = ~x, color = ~Group.1,
 ```{r gridyear}
 #| title: cell
 # number of cells per year per country
-ngrid_countyear <- aggregate(tab$grid10kmID, list(tab$Country, tab$Year), nodup)
+ngrid_countyear <- aggregate(tab$grid10kmID, list(tab$country, tab$Year), nodup)
 plot_ly(ngrid_countyear, x = ~Group.2, y = ~x, color = ~Group.1,
         type = "scatter", mode = "lines+markers",
         colors = countries_color) |> 

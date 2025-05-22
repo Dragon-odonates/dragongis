@@ -26,6 +26,7 @@ con <- dbConnect(
 occ_all <- dbGetQuery(con, 'SELECT "scientificName", "taxonRank",
                         "species", "genus", "family",
                         "decimalLatitude", "decimalLongitude", "country",
+                        "unsureCountry",
                         "eventDate", d."datasetID", d."datasetName", 
                         d."parentDatasetID", 
                         dpar."datasetName" AS "parentDatasetName",
@@ -71,12 +72,12 @@ occ_all_sf <- st_transform(occ_all_sf, 3035)
 saveRDS(occ_all_sf,
         file.path(out_folder, "occ_all_sf.rds"))
 
-# Save subdataset
-occ_sub_sf <- occ_all_sf[sample(1:nrow(occ_all_sf),
-                                size = 1000000,
-                                replace = FALSE), ]
-saveRDS(occ_sub_sf,
-        file.path(out_folder, "occ_sub_sf.rds"))
+# # Save subdataset
+# occ_sub_sf <- occ_all_sf[sample(1:nrow(occ_all_sf),
+#                                 size = 1000000,
+#                                 replace = FALSE), ]
+# saveRDS(occ_sub_sf,
+#         file.path(out_folder, "occ_sub_sf.rds"))
 
 # Save data.table
 geom <- st_coordinates(occ_all_sf)
@@ -88,11 +89,11 @@ saveRDS(occ_all,
         file.path(out_folder, "occ_all.rds"))
 rm(occ_all)
 
-# Save sub data.table
-geom <- st_coordinates(occ_sub_sf)
-occ_sub <- data.table(st_drop_geometry(occ_sub_sf))
-rm(occ_sub_sf)
-occ_sub[, `:=`(decimalLongitude = geom[, 1],
-               decimalLatitude = geom[, 2])]
-saveRDS(occ_sub,
-        file.path(out_folder, "occ_sub.rds"))
+# # Save sub data.table
+# geom <- st_coordinates(occ_sub_sf)
+# occ_sub <- data.table(st_drop_geometry(occ_sub_sf))
+# rm(occ_sub_sf)
+# occ_sub[, `:=`(decimalLongitude = geom[, 1],
+#                decimalLatitude = geom[, 2])]
+# saveRDS(occ_sub,
+#         file.path(out_folder, "occ_sub.rds"))

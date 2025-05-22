@@ -120,7 +120,7 @@ shinyServer(function(input, output, session) {
 
   output$gridts <- renderPlotly({
     dbi <- occsp()
-    nobs_year <- aggregate(dbi$grid10kmID, list(dbi$Country, dbi$Year), nodup)
+    nobs_year <- aggregate(dbi$grid10kmID, list(dbi$country, dbi$Year), nodup)
     plot_ly(nobs_year, x = ~Group.2, y = ~x, color = ~Group.1,
             type = "scatter", mode = "lines+markers",
             colors = countries_color) |>  
