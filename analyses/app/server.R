@@ -1,9 +1,19 @@
 shinyServer(function(input, output, session) {
 
+  ## Reactive data subset ----------
+  occsp <- reactive({
+    if(input$spe == "All"){
+      return(dt)
+    } else {
+      return(dt[dt$species %in% input$spe,])
+    }
+  })
+  
   # Maps --------------------------------------------------------------------
   output$mapsp <- renderTmap({
     tm_shape(sp) +
       tm_raster("All", 
+                col.legend = tm_legend(title = spleg()$lab),
                 options = opt_tm_raster(interpolate = FALSE), 
                 zindex = 401, group.control = "none") +
         tm_view(basemap.server = "OpenStreetMap",
@@ -13,6 +23,7 @@ shinyServer(function(input, output, session) {
   output$mappo <- renderTmap({
     tm_shape(po) +
       tm_raster("All", 
+                col.legend = tm_legend(title = poleg()$lab),
                 options = opt_tm_raster(interpolate = FALSE), 
                 zindex = 501, group.control = "none") +
       tm_view(basemap.server = "OpenStreetMap",
@@ -22,6 +33,7 @@ shinyServer(function(input, output, session) {
   output$mappy <- renderTmap({
     tm_shape(py) +
       tm_raster("All", 
+                col.legend = tm_legend(title = pyleg()$lab),
                 options = opt_tm_raster(interpolate = FALSE), 
                 zindex = 601, group.control = "none") +
       tm_view(basemap.server = "OpenStreetMap",
@@ -36,7 +48,7 @@ shinyServer(function(input, output, session) {
       splab <- "# observations"
     }
     return(list("lab" = splab))
-  })
+  }) 
 
   poleg <- reactive({
     if(input$spe == "All"){
@@ -56,15 +68,6 @@ shinyServer(function(input, output, session) {
     return(list("lab" = pylab))
   })
 
-  ## Reactive data subset ----------
-  occsp <- reactive({
-    if(input$spe == "All"){
-      return(dt)
-    } else {
-      return(dt[dt$species %in% input$spe,])
-    }
-  })
-
   ## Reactive map update ----------
   observe({
     tmapProxy("mapsp", session, {
@@ -77,13 +80,13 @@ shinyServer(function(input, output, session) {
                 col.legend = tm_legend(title = spleg()$lab), 
                 group.control = "none")
     })  
-  })
+  }) 
 
   observe({
     tmapProxy("mappo", session, {
       tm_remove_layer(501) +
       tm_shape(po) +
-      tm_raster(input$spe, 
+      tm_raster(isolate(input$spe), 
                 options = opt_tm_raster(interpolate = FALSE), 
                 zindex = 501,
                 col.scale = tm_scale_intervals(as.count = TRUE), 
