@@ -15,7 +15,7 @@ The analysis is divided in three sequential steps (each step has a dedicated R f
 
 1. extract data from the local database
 2. clean and transform the occurrence data, create a grid  
-3. and 3bis. compute statistics per grid cell (species richness, species occurence)  
+3. compute statistics per grid cell (e.g. species richness)  
 4. make exploration dashboard  
 5. prepare data for the species-specific Shiny app
 

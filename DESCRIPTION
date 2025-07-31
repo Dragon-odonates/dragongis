@@ -1,6 +1,6 @@
 Package: dragongis
 Title: Research compendium for gis processing of the DRAGON project database
-Version: 0.0.1
+Version: 0.0.2
 Authors@R: c(
     person(given   = "Romain",
            family  = "Frelat",
@@ -22,29 +22,20 @@ LazyDataCompression: xz
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.2
 Imports: 
-    circlize,
     devtools,
-    here,
-    htmltools,
     knitr,
     quarto,
-    remotes
+    remotes,
+    rmarkdown,
+    stats
 Depends: 
     R (>= 3.5.0),
-    crosstalk,
-    dplyr,
-    DT,
-    gt,
-    heatmaply,
-    leaflet,
-    mapview,
-    palmerpenguins,
+    collapse,
+    data.table,
+    here,
     plotly,
-    rgbif,
+    RColorBrewer,
+    RPostgres,
     sf,
-    shiny,
-    shinycssloaders,
     terra,
-    tidyverse,
-    tmap,
-    viridis
+    tmap

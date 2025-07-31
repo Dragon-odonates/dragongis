@@ -10,15 +10,10 @@ dragongis.Rproj
 data/raw-data
 
 # ignore heavy data 
-data/derived-data/vect_obs.rds
 data/derived-data/occ_all_df.rds
-data/temp_1km
-analyses/app/data/occ_mini.rds
 
 # ignore dev file
 analyses/test*
 analyses/old*
 analyses/draft*
 
-# rsconnect for shiny app
-analyses/app/rsconnect

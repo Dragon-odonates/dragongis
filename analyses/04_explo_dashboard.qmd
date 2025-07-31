@@ -10,17 +10,16 @@ format:
 # General exploration
 
 ```{r libraries}
-library(plotly)
-library(terra)
-library(tmap)
+devtools::load_all()
+# library(plotly)
+# library(terra)
+# library(tmap)
 
-library(collapse)
-library(RColorBrewer)
+# library(collapse)
+# library(RColorBrewer)
 
-library(here)
-
-funcdir <- here("functions")
-source(here(funcdir, "functions.R"))
+# library(here)
+# source(here("R", "functions.R"))
 ```
 
 ```{r load}
@@ -30,7 +29,7 @@ rastat <- readRDS(here("data", "derived-data", "stat_10000.rds"))
 rastat <- project(rastat, crs("EPSG:3857"))
 
 # interactive mode for tmap
-suppressMessages(tmap_mode("view"))
+tmap_mode("view") |> suppressMessages()
 ```
 
 
@@ -64,35 +63,57 @@ names(fam_color) <- fam
 ```{r obsyear}
 #| title: obs
 # number of observation per database
-nobs_dbyear <- aggregate(tab$observationID, 
-                         list(tab$dbID, tab$Year), nodup)
-plot_ly(nobs_dbyear, x = ~Group.2, y = ~x, color = ~Group.1, 
-        type = "scatter", mode = "lines+markers",
-        colors = dataset_color) |> 
-  layout(xaxis = list(title = 'Year'),
-         yaxis = list(title = 'Number of observations'))
+nobs_dbyear <- aggregate(tab$observationID, list(tab$dbID, tab$Year), nodup)
+plot_ly(
+  nobs_dbyear,
+  x = ~Group.2,
+  y = ~x,
+  color = ~Group.1,
+  type = "scatter",
+  mode = "lines+markers",
+  colors = dataset_color
+) |>
+  layout(
+    xaxis = list(title = 'Year'),
+    yaxis = list(title = 'Number of observations')
+  )
 ```
 
 ```{r gridyear}
 #| title: cell
 # number of cells per year per country
 ngrid_countyear <- aggregate(tab$grid10kmID, list(tab$country, tab$Year), nodup)
-plot_ly(ngrid_countyear, x = ~Group.2, y = ~x, color = ~Group.1,
-        type = "scatter", mode = "lines+markers",
-        colors = countries_color) |> 
-    layout(xaxis = list(title = 'Year'),
-           yaxis = list(title = 'Number of grid cells'))
+plot_ly(
+  ngrid_countyear,
+  x = ~Group.2,
+  y = ~x,
+  color = ~Group.1,
+  type = "scatter",
+  mode = "lines+markers",
+  colors = countries_color
+) |>
+  layout(
+    xaxis = list(title = 'Year'),
+    yaxis = list(title = 'Number of grid cells')
+  )
 ```
 
 ```{r taxayear}
 #| title: taxa
 nspe_famyear <- aggregate(tab$species, list(tab$family, tab$Year), nodup)
-plot_ly(nspe_famyear, x = ~Group.2, y = ~x, color = ~Group.1,
-        type = "bar",
-        colors = fam_color) |> 
-        layout(xaxis = list(title = 'Year'),
-           yaxis = list(title = 'Number of taxa'), 
-           barmode = 'stack')
+plot_ly(
+  nspe_famyear,
+  x = ~Group.2,
+  y = ~x,
+  color = ~Group.1,
+  type = "bar",
+  colors = fam_color
+) |>
+  layout(
+    xaxis = list(title = 'Year'),
+    yaxis = list(title = 'Number of taxa'),
+    barmode = 'stack'
+  )
 ```
 
 
@@ -101,23 +122,34 @@ plot_ly(nspe_famyear, x = ~Group.2, y = ~x, color = ~Group.1,
 ```{r heatdbspe}
 #| title: taxa per db
 # number of species per database per year
-nspe_db_year <- tapply(tab$species, list(tab$dbID,tab$Year), nodup)
-plot_ly(x = colnames(nspe_db_year), 
-        y = rownames(nspe_db_year), 
-        z = nspe_db_year, type = "heatmap") |>
-    layout(margin = list(l = 120))
+nspe_db_year <- tapply(tab$species, list(tab$dbID, tab$Year), nodup)
+plot_ly(
+  x = colnames(nspe_db_year),
+  y = rownames(nspe_db_year),
+  z = nspe_db_year,
+  type = "heatmap"
+) |>
+  layout(margin = list(l = 120))
 ```
 
 ```{r heatgridspe}
 #| title: cell per species
-# number of observations per database per year
-# nobs_db_year <- table(tab$dbID, tab$Year)
-# nobs_db_year[nobs_db_year==0] <- NA
-ngrid_sp_year <- tapply(tab$grid10kmID, list(tab$species,tab$Year), nodup)
-plot_ly(x = colnames(ngrid_sp_year), 
-        y = rownames(ngrid_sp_year), 
-        z = ngrid_sp_year, type = "heatmap") |>
-    layout(margin = list(l = 120))
+# number of cell per species per year
+ngrid_sp_year <- tapply(tab$grid10kmID, list(tab$species, tab$Year), nodup)
+# keep only most common species
+# based on number of cell x years
+totcell <- rowSums(ngrid_sp_year, na.rm = TRUE)
+# keep the first quartile
+ngrid_sp_year <- ngrid_sp_year[
+  totcell > stats::quantile(totcell, probs = 0.75),
+]
+plot_ly(
+  x = colnames(ngrid_sp_year),
+  y = rownames(ngrid_sp_year),
+  z = ngrid_sp_year,
+  type = "heatmap"
+) |>
+  layout(margin = list(l = 120))
 ```
 
 
@@ -126,60 +158,54 @@ plot_ly(x = colnames(ngrid_sp_year),
 ```{r spemap}
 #| title: spe
 tm_shape(rastat) +
-       tm_raster("nspe",
-                 col.scale = tm_scale_continuous(),
-                 options = opt_tm_raster(interpolate = FALSE),
-                 group.control = "none",
-                 col.legend = tm_legend(title = "Richness")) +
-       tm_view(basemap.server = "OpenStreetMap",
-              set_view = c(7, 55, 4))
+  tm_raster(
+    "nspe",
+    col.scale = tm_scale_continuous(),
+    options = opt_tm_raster(interpolate = FALSE),
+    group.control = "none",
+    col.legend = tm_legend(title = "Richness")
+  ) +
+  tm_view(basemap.server = "OpenStreetMap", set_view = c(7, 55, 4))
 ```
 
 ```{r obsmap}
 #| title: obs
 tm_shape(rastat) +
-       tm_raster("nobs", 
-                 options = opt_tm_raster(interpolate = FALSE), 
-                 group.control = "none",
-                 col.legend = tm_legend(title = "# obs"),
-                 col.scale = tm_scale_intervals(style = "log10_pretty")) +
-       tm_view(basemap.server = "OpenStreetMap",
-              set_view = c(7, 55, 4))
+  tm_raster(
+    "nobs",
+    options = opt_tm_raster(interpolate = FALSE),
+    group.control = "none",
+    col.legend = tm_legend(title = "# obs"),
+    col.scale = tm_scale_intervals(style = "log10_pretty")
+  ) +
+  tm_view(basemap.server = "OpenStreetMap", set_view = c(7, 55, 4))
 ```
 
 ```{r yrmap}
 #| title: year
 tm_shape(rastat) +
-       tm_raster("nyr", 
-                 options = opt_tm_raster(interpolate = FALSE), 
-                 group.control = "none",
-                 col.legend = tm_legend(title = "# years"),
-                 col.scale = tm_scale_continuous()) +
-       tm_view(basemap.server = "OpenStreetMap",
-              set_view = c(7, 55, 4))
+  tm_raster(
+    "nyr",
+    options = opt_tm_raster(interpolate = FALSE),
+    group.control = "none",
+    col.legend = tm_legend(title = "# years"),
+    col.scale = tm_scale_continuous()
+  ) +
+  tm_view(basemap.server = "OpenStreetMap", set_view = c(7, 55, 4))
 ```
 
+# About
 
 
-# Species accumulation curves
 
-```{r speciacc, include=FALSE, eval=FALSE}
-# load data
-load(here::here("data", "derived-data", "speacc_50.Rdata"))
+The [**Dragon** project](https://www.fondationbiodiversite.fr/en/the-frb-in-action/programs-and-projects/le-cesab/dragon/) focuses on odonates (dragonflies and damselflies), a charismatic and important but often neglected taxonomic group that provides a unique opportunity to **study anthropogenic impacts on interface ecosystems linking terrestrial and freshwater environments**. The characteristics of this group make it a good candidate for the development of a new indicators to inform and support environmental management. The project aims to mobilise and use opportunistic and standardised data on odonates in Europe to obtain temporal trends of populations and species distributions at different spatial scales.  
 
-seqx <- 2:100
-# smooth the curve
-lo <- loess(sa_all$Q0.5 ~ seqx)
-fig <- plot_ly(x = seqx) 
-fig <- fig |> 
-       add_lines(y = predict(lo), name = "all", 
-       line = list(color = 'rgb(0, 0, 0)', width = 2)) 
+The research project **Dragon** was selected from the [2022 FRB-MTE-OFB "Antropogenic pressures and impacts on terrestrial biodiversity](https://www.fondationbiodiversite.fr/en/calls/appel-a-projets-frb-mte-ofb-2022-impacts-sur-la-biodiversite-terrestre-dans-lanthropocene/).  
 
-for (i in seq_along(sa_db)){
-  li <- loess(sa_db[[i]]$Q0.5 ~ seqx)
-  fig <- fig |> add_lines(y = predict(li), name = names(sa_db)[i]) 
-}
-fig |> layout(title = "Species accumulation curves", 
-              xaxis = list(title = "Number of observations"),
-              yaxis = list(title = "Number of species"))
-```
+
+This is a beta version with non tested functionality and incomplete metadata. Source code is available on [Github](https://github.com/Dragon-odonates/dragongis)
+
+<!-- badges: start -->
+[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
+![Lifecycle Experimental](https://img.shields.io/badge/Lifecycle-Experimental-339999)
+<!-- badges: end -->
