@@ -38,7 +38,16 @@ paste("Data rast done in", round(duration_rast, 3), "min") # Data rast done in 0
 
 # 3 Exploratory dashboard
 start_qmd_timer <- Sys.time()
-quarto::quarto_render(here::here("analyses", "04_explo_dashboard.qmd"))
+quarto::quarto_render(
+  here::here("analyses", "04_explo_dashboard.qmd"),
+)
+file.copy(
+  from = here("analyses", "04_explo_dashboard.html"),
+  to = here("docs", "index.html"),
+  copy.mode = FALSE,
+  overwrite = TRUE
+)
+file.remove(here("analyses", "04_explo_dashboard.html"))
 end_qmd_timer <- Sys.time()
 duration_qmd <- as.numeric(end_qmd_timer - start_qmd_timer, units = "mins")
 paste("Dashboard done in", round(duration_qmd, 3), "min") # Dashboard done in 2.203 min

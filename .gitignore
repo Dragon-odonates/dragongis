@@ -9,11 +9,14 @@ dragongis.Rproj
 # ignore raw dataset
 data/raw-data
 
-# ignore heavy data 
+# ignore heavy data
 data/derived-data/occ_all_df.rds
+data/derived-data/cells_10000.rds
 
 # ignore dev file
 analyses/test*
 analyses/old*
 analyses/draft*
 
+
+/.quarto/

@@ -5,22 +5,23 @@ format:
   dashboard:
     orientation: columns
     embed-resources: true
+    nav-buttons: [github]
 ---
 
 # General exploration
 
 ```{r libraries}
-devtools::load_all()
-# library(plotly)
-# library(terra)
-# library(tmap)
+library(plotly)
+library(terra)
+library(tmap)
 
-# library(collapse)
-# library(RColorBrewer)
+library(collapse)
+library(RColorBrewer)
 
-# library(here)
-# source(here("R", "functions.R"))
+library(here)
+source(here("R", "functions.R"))
 ```
+
 
 ```{r load}
 tab <- readRDS(here("data", "derived-data", "occ_all_df.rds"))
@@ -61,7 +62,7 @@ names(fam_color) <- fam
 ```
 
 ```{r obsyear}
-#| title: obs
+#| title: observations
 # number of observation per database
 nobs_dbyear <- aggregate(tab$observationID, list(tab$dbID, tab$Year), nodup)
 plot_ly(
@@ -75,14 +76,27 @@ plot_ly(
 ) |>
   layout(
     xaxis = list(title = 'Year'),
-    yaxis = list(title = 'Number of observations')
+    yaxis = list(title = 'Number of observations'),
+    legend = list(title = list(text = 'Databases'))
   )
 ```
 
 ```{r gridyear}
-#| title: cell
+#| title: spatial cover
 # number of cells per year per country
-ngrid_countyear <- aggregate(tab$grid10kmID, list(tab$country, tab$Year), nodup)
+
+# simplify country
+tab$CO <- substr(tab$dbID, 1, 2)
+conv <- table(tab$country, tab$CO)
+convC0 <- row.names(conv)[apply(conv, 2, which.max)]
+names(convC0) <- colnames(conv)
+tab$country <- convC0[tab$CO]
+
+ngrid_countyear <- aggregate(
+  tab$grid10kmID,
+  list(tab$country, tab$Year),
+  nodup
+)
 plot_ly(
   ngrid_countyear,
   x = ~Group.2,
@@ -94,12 +108,13 @@ plot_ly(
 ) |>
   layout(
     xaxis = list(title = 'Year'),
-    yaxis = list(title = 'Number of grid cells')
+    yaxis = list(title = 'Number of grid cells'),
+    legend = list(title = list(text = 'Country'))
   )
 ```
 
 ```{r taxayear}
-#| title: taxa
+#| title: taxonomy
 nspe_famyear <- aggregate(tab$species, list(tab$family, tab$Year), nodup)
 plot_ly(
   nspe_famyear,
@@ -112,6 +127,7 @@ plot_ly(
   layout(
     xaxis = list(title = 'Year'),
     yaxis = list(title = 'Number of taxa'),
+    legend = list(title = list(text = 'Family')),
     barmode = 'stack'
   )
 ```
@@ -120,20 +136,24 @@ plot_ly(
 ### Row {.tabset}
 
 ```{r heatdbspe}
-#| title: taxa per db
+#| title: Community
 # number of species per database per year
 nspe_db_year <- tapply(tab$species, list(tab$dbID, tab$Year), nodup)
 plot_ly(
   x = colnames(nspe_db_year),
   y = rownames(nspe_db_year),
   z = nspe_db_year,
-  type = "heatmap"
+  type = "heatmap",
+  colorbar = list(title = list(text = 'Species\nRichness'))
 ) |>
-  layout(margin = list(l = 120))
+  layout(
+    yaxis = list(title = 'Database'),
+    margin = list(l = 120)
+  )
 ```
 
 ```{r heatgridspe}
-#| title: cell per species
+#| title: Species
 # number of cell per species per year
 ngrid_sp_year <- tapply(tab$grid10kmID, list(tab$species, tab$Year), nodup)
 # keep only most common species
@@ -147,7 +167,8 @@ plot_ly(
   x = colnames(ngrid_sp_year),
   y = rownames(ngrid_sp_year),
   z = ngrid_sp_year,
-  type = "heatmap"
+  type = "heatmap",
+  colorbar = list(title = list(text = 'N grid cells'))
 ) |>
   layout(margin = list(l = 120))
 ```
@@ -156,7 +177,7 @@ plot_ly(
 
 ## Column {.tabset}
 ```{r spemap}
-#| title: spe
+#| title: Community
 tm_shape(rastat) +
   tm_raster(
     "nspe",
@@ -169,7 +190,7 @@ tm_shape(rastat) +
 ```
 
 ```{r obsmap}
-#| title: obs
+#| title: Observations
 tm_shape(rastat) +
   tm_raster(
     "nobs",
@@ -182,7 +203,7 @@ tm_shape(rastat) +
 ```
 
 ```{r yrmap}
-#| title: year
+#| title: Temporal
 tm_shape(rastat) +
   tm_raster(
     "nyr",
@@ -194,8 +215,7 @@ tm_shape(rastat) +
   tm_view(basemap.server = "OpenStreetMap", set_view = c(7, 55, 4))
 ```
 
-# About
-
+# About Dragon
 
 
 The [**Dragon** project](https://www.fondationbiodiversite.fr/en/the-frb-in-action/programs-and-projects/le-cesab/dragon/) focuses on odonates (dragonflies and damselflies), a charismatic and important but often neglected taxonomic group that provides a unique opportunity to **study anthropogenic impacts on interface ecosystems linking terrestrial and freshwater environments**. The characteristics of this group make it a good candidate for the development of a new indicators to inform and support environmental management. The project aims to mobilise and use opportunistic and standardised data on odonates in Europe to obtain temporal trends of populations and species distributions at different spatial scales.  
@@ -209,3 +229,10 @@ This is a beta version with non tested functionality and incomplete metadata. So
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 ![Lifecycle Experimental](https://img.shields.io/badge/Lifecycle-Experimental-339999)
 <!-- badges: end -->
+
+
+```{r end}
+#| expandable: false
+#| fill: false
+
+```
