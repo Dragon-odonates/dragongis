@@ -1,8 +1,14 @@
 # Extract data from database
-# This script works only on the computer hosting the Dragon database
+#
 # input:
 #  raw-data/EEA_50km.gpkg
-#  raw-data/U2018_CLC2018_V2020_20u1.tif
+#  raw-data/CHELSA_bio1_1981-2010_V.2.1.tif
+#  raw-data/CHELSA_bio10_1981-2010_V.2.1.tif
+#  raw-data/CHELSA_bio12_1981-2010_V.2.1.tif
+#  raw-data/CHELSA_bio15_1981-2010_V.2.1.tif
+#  raw-data/CHELSA_bio4_1981-2010_V.2.1.tif
+# output:
+#  derived-data/Bioclim_50km.csv
 
 # CHELSA
 # Karger, D.N., Conrad, O., Böhner, J., Kawohl, T., Kreft, H., Soria-Auza, R.W., Zimmermann, N.E., Linder, P., Kessler, M. (2017).
@@ -21,9 +27,9 @@
 devtools::load_all()
 
 # Load the EEA 50km grid with terra
-grid <- vect(here("data", "derived-data", "EU_grid_50km.gpkg"))
+grid <- st_read(here("data", "derived-data", "EU_grid_50km.gpkg"))
 # transform to lat/long WGS84
-grid_4326 <- project(grid, "EPSG:4326")
+grid_4326 <- st_transform(grid, "EPSG:4326")
 
 # Load the bioclimatic data
 chelsa_files <- list.files(
@@ -36,10 +42,16 @@ chelsa_files <- list.files(
 bio <- rast(chelsa_files)
 
 # make the extraction with terra
-bio_50k <- extract(bio, grid, fun = mean, na.rm = TRUE)
-bio_50k$ID <- grid$cellcode
+bio_50k <- exactextractr::exact_extract(
+  bio,
+  grid,
+  fun = 'mean',
+  progress = TRUE,
+  append_cols = "cellcode"
+)
+
 lab <- sapply(strsplit(chelsa_files, "_"), function(x) x[[2]])
-names(bio_50k) <- c("cellcode", lab)
+names(bio_50k)[-1] <- lab
 
 # save full extraction (to avoid repeting the previous step)
 write.csv(

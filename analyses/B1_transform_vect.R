@@ -1,7 +1,14 @@
-library(terra)
-library(sf)
-library(data.table)
-library(here)
+# Transform occurrence data on 50km grid
+# usefull for shinyapp (but not needed for further modelling)
+# input:
+#  raw-data/occ_all.rds
+#  raw-data/EEA_50km.gpkg
+# output:
+#  derived-data/occ_grid_50km.rds
+#  derived-data/EU_grid_50km.gpkg
+#  derived-data/EU_points_50km.gpkg
+
+devtools::load_all()
 
 # Load data ---------------------------------------------------------------
 df <- readRDS(here::here("data", "raw-data", "occ_all.rds"))
@@ -73,11 +80,11 @@ names(ag) <- c("species", "year", "gridID", "n")
 # obs_per_grid <- tapply(ag$n, ag$gridID, sum)
 # # plot(cumsum(sort(obs_per_grid)), log = "y")
 # keep_grid <- names(obs_per_grid)[obs_per_grid > 5]
-ag <- ag[ag$gridID %in% keep_grid, ]
+# ag <- ag[ag$gridID %in% keep_grid, ]
 
 # Export data -------------------------------------------------------------
 saveRDS(ag, here("data", "derived-data", "occ_grid_50km.rds"))
-ag <- readRDS(here("data", "derived-data", "occ_grid_50km.rds"))
+# ag <- readRDS(here("data", "derived-data", "occ_grid_50km.rds"))
 
 # export grid from EU
 gridEU <- grid[grid$cellcode %in% ag$gridID, ]

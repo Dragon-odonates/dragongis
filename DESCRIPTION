@@ -23,7 +23,6 @@ Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.2
 Imports: 
     devtools,
-    dplyr,
     knitr,
     quarto,
     remotes,
@@ -32,10 +31,12 @@ Imports:
 Depends: 
     R (>= 3.5.0),
     collapse,
-    crosstalk,
     data.table,
+    exactextractr,
     here,
-    leaflet,
+    plotly,
+    RColorBrewer,
     RPostgres,
     sf,
-    terra
+    terra,
+    tmap
