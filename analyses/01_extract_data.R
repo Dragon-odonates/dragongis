@@ -13,20 +13,21 @@ out_folder <- here("data/raw-data")
 
 # Query DB ----------------------------------------------------------------
 
+dbname <- "dragon"
+
 # Connect to "local" DB
 con <- dbConnect(
   drv       = RPostgres::Postgres(),
-  dbname    = "dragon",
+  dbname    = dbname,
   host      = "localhost",
   port      = 5432,
   user      = Sys.getenv('USERNAME'),
   password  = Sys.getenv('PASSWORD')
 )
 
-occ_all <- dbGetQuery(con, 'SELECT "scientificName", "taxonRank",
-                        "species", "genus", "family",
+occ_all <- dbGetQuery(con, 'SELECT "Taxon"."taxonID", "scientificName", 
+                        "taxonRank", "lifeStage",
                         "decimalLatitude", "decimalLongitude", "country",
-                        "unsureCountry",
                         "eventDate", d."datasetID", d."datasetName", 
                         d."parentDatasetID", 
                         dpar."datasetName" AS "parentDatasetName",
@@ -49,9 +50,10 @@ occ_all <- dbGetQuery(con, 'SELECT "scientificName", "taxonRank",
                             ON "Recorder"."recorderID" = "Event"."recorderID" 
                             AND "Recorder"."datasetID" = d."datasetID"
                         WHERE "decimalLatitude" IS NOT NULL 
-                            AND "decimalLongitude" IS NOT NULL 
-                            AND ("occurrenceStatus" = \'present\' 
-                                OR "occurrenceStatus" IS NULL);')
+                            AND "decimalLongitude" IS NOT NULL
+                            AND "eventDateUncertainty" = \'day\' ;')
+
+taxo <- dbGetQuery(con, 'SELECT * FROM "Taxon";')
 
 dbDisconnect(con)
 
@@ -61,10 +63,8 @@ dbDisconnect(con)
 # Transform to sf
 occ_all_sf <- st_as_sf(occ_all, 
                        coords = c( "decimalLongitude", "decimalLatitude"),
-                       na.fail = FALSE)
+                       crs = 4326)
 rm(occ_all)
-
-st_crs(occ_all_sf) <- 4326
 
 # Transform coordinates
 occ_all_sf <- st_transform(occ_all_sf, 3035)
@@ -72,28 +72,17 @@ occ_all_sf <- st_transform(occ_all_sf, 3035)
 saveRDS(occ_all_sf,
         file.path(out_folder, "occ_all_sf.rds"))
 
-# # Save subdataset
-# occ_sub_sf <- occ_all_sf[sample(1:nrow(occ_all_sf),
-#                                 size = 1000000,
-#                                 replace = FALSE), ]
-# saveRDS(occ_sub_sf,
-#         file.path(out_folder, "occ_sub_sf.rds"))
-
-# Save data.table
-geom <- st_coordinates(occ_all_sf)
+# Rewrite dt with new CRS
+coord <- st_coordinates(occ_all_sf)
 occ_all <- data.table(st_drop_geometry(occ_all_sf))
 rm(occ_all_sf)
-occ_all[, `:=`(decimalLongitude = geom[, 1],
-               decimalLatitude = geom[, 2])]
-saveRDS(occ_all,
-        file.path(out_folder, "occ_all.rds"))
-rm(occ_all)
 
-# # Save sub data.table
-# geom <- st_coordinates(occ_sub_sf)
-# occ_sub <- data.table(st_drop_geometry(occ_sub_sf))
-# rm(occ_sub_sf)
-# occ_sub[, `:=`(decimalLongitude = geom[, 1],
-#                decimalLatitude = geom[, 2])]
-# saveRDS(occ_sub,
-#         file.path(out_folder, "occ_sub.rds"))
+occ_all[, `:=`(decimalLongitude = coord[, "X"], 
+               decimalLatitude = coord[, "Y"])]
+saveRDS(occ_all, 
+        file.path(out_folder, "occ_all.rds"))
+
+# Save complete taxo
+taxo <- as.data.table(taxo)
+saveRDS(taxo, 
+        file.path(out_folder, "taxo.rds"))
