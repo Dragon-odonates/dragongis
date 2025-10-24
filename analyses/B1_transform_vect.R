@@ -15,7 +15,7 @@ devtools::load_all()
 country_list <- c("Austria", "Belgium", "Cyprus", "Czechia",
                   "Denmark", "Finland", "France", "Germany",
                   "Ireland", "Italy", "Luxembourg", "Netherlands",
-                  "Norway", "Slovenia", "Spain", "Sweden", "Switzerland",
+                  "Norway", "Portugal", "Slovenia", "Spain", "Sweden", "Switzerland",
                   "United Kingdom")
 
 gridsize <- 50000
@@ -77,5 +77,11 @@ gridfile_write <- paste0("EU_grid_", gridsize_km, "km_crop.gpkg")
 writeVector(
   grid_crop,
   here("data", "derived-data", gridfile_write),
+  overwrite = TRUE
+)
+
+writeVector(
+  countries,
+  here("data", "derived-data", "countries.gpkg"),
   overwrite = TRUE
 )
